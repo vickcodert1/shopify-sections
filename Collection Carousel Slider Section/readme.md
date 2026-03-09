@@ -1,4 +1,3 @@
 Free Collection Carousel Slider Section for Shopify themes, you can use it on any theme (Free or Paid).
 
-https://youtu.be/qhZ3whWhquk?si=RTR8i6r9rjYe0T2A
-
+[![Custom Font in Shopify](https://i.ytimg.com/vi/qhZ3whWhquk/maxresdefault.jpg)](https://youtu.be/qhZ3whWhquk)
