@@ -1,0 +1,190 @@
+<section id="coming-soon" class="coming-soon-section">
+  <div class="container">
+    <h1>{{ section.settings.heading }}</h1>
+    <p>{{ section.settings.subheading }}</p>
+    {% if section.settings.show_countdown %}
+      <div id="countdown">
+        <span id="days"></span>
+        <span id="hours"></span>
+        <span id="minutes"></span>
+        <span id="seconds"></span>
+      </div>
+    {% endif %}
+      {%- form 'storefront_password', class: 'password-form' -%}
+              <div class="password-field field{% if form.errors %} password-field--error{% endif %}">
+                <input
+                  type="password"
+                  name="password"
+                  id="Password"
+                  class="field__input"
+                  autocomplete="current-password"
+                  {% if form.errors %}
+                    aria-invalid="true"
+                    aria-describedby="PasswordLoginForm-password-error"
+                  {%- endif -%}
+                  placeholder="{{ 'general.password_page.login_form_password_placeholder' | t }}"
+                >
+                <label class="field__label" for="{{ 'general.password_page.login_form_password_label' | t }}">
+                  {{- 'general.password_page.login_form_password_placeholder' | t -}}
+                </label>
+                {%- if form.errors -%}
+                  <div id="PasswordLoginForm-password-error" role="status">
+                    <span class="visually-hidden">{{ 'accessibility.error' | t }}</span>
+                    <span class="form__message">
+                      <span class="svg-wrapper">
+                        {{- 'icon-error' | inline_asset_content -}}
+                      </span>
+                      {{ 'general.password_page.login_form_error' | t -}}
+                    </span>
+                  </div>
+                {%- endif -%}
+              </div>
+              <button name="commit" class="password-button button button--outline">
+                {{ 'general.password_page.login_form_submit' | t }}
+              </button>
+            {%- endform -%}
+            <small class="password__footer-text">{{ 'general.password_page.admin_link_html' | t }}</small>
+  </div>
+</section>
+
+<style>
+  .coming-soon-section {
+    text-align: center;
+    padding: 50px 20px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: linear-gradient(90deg, #e3ffe7 0%, #d9e7ff 100%);
+    z-index: 9999; /* Ensure it's on top */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .coming-soon-section h1 {
+    margin-bottom: 20px;
+    font-size: 72px !important;
+    background: -webkit-linear-gradient(#eee, #333);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  .coming-soon-section p {
+    font-size: 1.5rem;
+    margin-bottom: 40px;
+    font-weight: bolder;
+  }
+  
+  @media (max-width: 768px) {
+    .coming-soon-section h1 {
+      font-size: 25px !important;
+    }
+    
+    .coming-soon-section p {
+      font-size: 2.5rem !important;
+    }
+  }
+  
+  #countdown {
+    font-size: 2rem;
+    font-weight: bold;
+    color: white;
+    background: linear-gradient(90deg, #e3ffe7 0%, #d9e7ff 100%);
+    width: min-content;
+    display: flex;
+    justify-content: center;
+    margin: auto;
+    align-items: center;
+    padding: 20px;
+    border: 2px solid #000;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+  }
+  
+  .countdown-unit {
+    display: inline-block;
+    padding: 10px;
+    border: 2px solid #000; /* Black border */
+    border-radius: 5px; /* Rounded corners */
+    margin: 0 5px; /* Spacing between units */
+    background-color: black; /* Light background color for contrast */
+  }
+</style>
+
+
+<script>
+  // Parse countdown date from Liquid variable
+  var countDownDate = new Date("{{ section.settings.countdown_date }}T00:00:00").getTime();
+  console.log("Countdown Date:", new Date(countDownDate).toLocaleString());
+
+  var x = setInterval(function() {
+    var now = new Date().getTime();
+    var distance = countDownDate - now;
+
+    // Calculate days, hours, minutes, and seconds
+    var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    // Display the result in the respective elements
+    if (distance > 0) {
+      document.getElementById("days").innerHTML = 
+        "<span class='countdown-unit'>" + days + "d </span>";
+      document.getElementById("hours").innerHTML = 
+        "<span class='countdown-unit'>" + hours + "h </span>";
+      document.getElementById("minutes").innerHTML = 
+        "<span class='countdown-unit'>" + minutes + "m </span>";
+      document.getElementById("seconds").innerHTML = 
+        "<span class='countdown-unit'>" + seconds + "s </span>";
+    } else {
+      clearInterval(x);
+      document.getElementById("countdown").innerHTML = "EXPIRED";
+    }
+  }, 1000);
+</script>
+
+        
+{% assign scheme1 = settings.color_schemes | first %}
+{%- if section.settings.color_scheme == scheme1 -%}<hr>{%- endif -%}
+
+{% schema %}
+{
+  "name": "Coming Soon",
+  "settings": [
+     {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Our Store is Coming Soon"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Stay tuned for something amazing!"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_countdown",
+      "label": "Show Countdown",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "countdown_date",
+      "label": "Countdown Date (YYYY-MM-DD)",
+      "default": "2024-12-31"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Coming Soon",
+      "category": "Custom"
+    }
+  ]
+}
+{% endschema %}
