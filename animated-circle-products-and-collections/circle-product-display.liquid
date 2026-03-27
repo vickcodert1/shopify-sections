@@ -1,1 +1,352 @@
+{%- style -%}
+  .circle-section {
+    background-color: {{ section.settings.background_color | default: '#ffffff' }};
+    padding: 40px 0;
+    text-align: center;
+  }
 
+  .circle-section__heading {
+    color: {{ section.settings.heading_color | default: '#000000' }};
+    font-size: {{ section.settings.heading_font_size | default: 32 }}px;
+    font-weight: {{ section.settings.heading_font_weight | default: 'bold' }};
+    margin-bottom: 10px;
+  }
+
+  .circle-section__subheading {
+    color: {{ section.settings.subheading_color | default: '#666666' }};
+    font-size: {{ section.settings.subheading_font_size | default: 18 }}px;
+    font-weight: {{ section.settings.subheading_font_weight | default: 'normal' }};
+    margin-bottom: 20px;
+  }
+
+  .circle-container {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    height: 600px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .large-circle {
+    position: absolute;
+    width: 282px;
+    height: 282px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: {{ section.settings.large_circle_border_width }}px solid {{ section.settings.large_circle_border_color }};
+    background-color: {{ section.settings.large_circle_bg_color }};
+    cursor: pointer;
+  }
+
+  .large-circle img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .small-circle {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: {{ section.settings.small_circle_border_width }}px solid {{ section.settings.small_circle_border_color }};
+    background-color: {{ section.settings.small_circle_bg_color }};
+    cursor: pointer;
+    transition: transform 0.3s ease;
+  }
+
+  .small-circle img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .circle-container:hover .small-circle {
+    animation-play-state: paused;
+  }
+
+  /* Responsive adjustments for mobile */
+  @media (max-width: 768px) {
+    .circle-container {
+      max-width: 350px;
+      height: 350px;
+    }
+
+    .large-circle {
+      width: 150px;
+      height: 150px;
+    }
+
+    .small-circle {
+      width: 60px;
+      height: 60px;
+      transform: rotate({{ forloop.index0 | times: 360 | divided_by: section.blocks.size }}deg) translate(120px) rotate(-{{ forloop.index0 | times: 360 | divided_by: section.blocks.size }}deg);
+    }
+
+    .circle-section__heading {
+      font-size: {{ section.settings.heading_font_size | default: 32 | times: 0.8 }}px;
+    }
+
+    .circle-section__subheading {
+      font-size: {{ section.settings.subheading_font_size | default: 18 | times: 0.8 }}px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .circle-container {
+      max-width: 300px;
+      height: 300px;
+    }
+
+    .large-circle {
+      width: 120px;
+      height: 120px;
+    }
+
+    .small-circle {
+      width: 50px;
+      height: 50px;
+      transform: rotate({{ forloop.index0 | times: 360 | divided_by: section.blocks.size }}deg) translate(100px) rotate(-{{ forloop.index0 | times: 360 | divided_by: section.blocks.size }}deg);
+    }
+
+    .circle-section__heading {
+      font-size: {{ section.settings.heading_font_size | default: 32 | times: 0.6 }}px;
+    }
+
+    .circle-section__subheading {
+      font-size: {{ section.settings.subheading_font_size | default: 18 | times: 0.6 }}px;
+    }
+  }
+{%- endstyle -%}
+
+<section class="circle-section">
+  {% if section.settings.heading != blank %}
+    <h2 class="circle-section__heading">{{ section.settings.heading }}</h2>
+  {% endif %}
+  {% if section.settings.subheading != blank %}
+    <p class="circle-section__subheading">{{ section.settings.subheading }}</p>
+  {% endif %}
+
+  <div class="circle-container" data-rotation-speed="{{ section.settings.rotation_speed | default: 10 }}">
+    <a href="#" class="large-circle" id="large-circle">
+      <img src="{{ section.blocks.first.settings.product.featured_image  | default: section.blocks.first.settings.collection.image | default: 'https://via.placeholder.com/300' | img_url: 'original' }}" alt="Large Circle Image" id="large-circle-img">
+    </a>
+
+    {% for block in section.blocks %}
+      {% assign item = block.settings.product | default: block.settings.collection %}
+      {% assign item_url = item.url %}
+      {% assign item_image = item.featured_image | default: item.image | default: 'https://via.placeholder.com/100' %}
+      <div class="small-circle" data-url="{{ item_url }}" data-image="{{ item_image | img_url: 'master' }}" style="transform: rotate({{ forloop.index0 | times: 360 | divided_by: section.blocks.size }}deg) translate(200px) rotate(-{{ forloop.index0 | times: 360 | divided_by: section.blocks.size }}deg);">
+        <img src="{{ item_image | img_url: 'master' }}" alt="{{ item.title }}">
+      </div>
+    {% endfor %}
+  </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const container = document.querySelector('.circle-container');
+    const smallCircles = document.querySelectorAll('.small-circle');
+    const largeCircle = document.querySelector('#large-circle');
+    const largeCircleImg = document.querySelector('#large-circle-img');
+    let angle = 0;
+    let radius = window.innerWidth <= 480 ? 100 : window.innerWidth <= 768 ? 120 : 200;
+    const speed = parseFloat(container.dataset.rotationSpeed) || 10;
+    let animationFrame;
+
+    function rotateCircles() {
+      angle += speed / 60;
+      smallCircles.forEach((circle, index) => {
+        const offset = (index * 360) / smallCircles.length;
+        const newAngle = angle + offset;
+        circle.style.transform = `rotate(${newAngle}deg) translate(${radius}px) rotate(-${newAngle}deg)`;
+      });
+      animationFrame = requestAnimationFrame(rotateCircles);
+    }
+
+    animationFrame = requestAnimationFrame(rotateCircles);
+
+    container.addEventListener('mouseenter', () => {
+      cancelAnimationFrame(animationFrame);
+    });
+
+    container.addEventListener('mouseleave', () => {
+      animationFrame = requestAnimationFrame(rotateCircles);
+    });
+
+    smallCircles.forEach(circle => {
+      circle.addEventListener('click', () => {
+        const image = circle.dataset.image;
+        const url = circle.dataset.url;
+        largeCircleImg.src = image;
+        largeCircle.href = url;
+      });
+    });
+
+    window.addEventListener('resize', () => {
+      radius = window.innerWidth <= 480 ? 100 : window.innerWidth <= 768 ? 120 : 200;
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Circle Product Display",
+  "settings": [
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Section Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Featured Products"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading Color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "heading_font_size",
+      "label": "Heading Font Size",
+      "min": 16,
+      "max": 48,
+      "step": 1,
+      "default": 32,
+      "unit": "px"
+    },
+    {
+      "type": "select",
+      "id": "heading_font_weight",
+      "label": "Heading Font Weight",
+      "options": [
+        { "value": "normal", "label": "Normal" },
+        { "value": "bold", "label": "Bold" },
+        { "value": "bolder", "label": "Bolder" }
+      ],
+      "default": "bold"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Explore our curated collection"
+    },
+    {
+      "type": "color",
+      "id": "subheading_color",
+      "label": "Subheading Color",
+      "default": "#666666"
+    },
+    {
+      "type": "range",
+      "id": "subheading_font_size",
+      "label": "Subheading Font Size",
+      "min": 12,
+      "max": 32,
+      "step": 1,
+      "default": 18,
+      "unit": "px"
+    },
+    {
+      "type": "select",
+      "id": "subheading_font_weight",
+      "label": "Subheading Font Weight",
+      "options": [
+        { "value": "normal", "label": "Normal" },
+        { "value": "bold", "label": "Bold" },
+        { "value": "bolder", "label": "Bolder" }
+      ],
+      "default": "normal"
+    },
+    {
+      "type": "range",
+      "id": "rotation_speed",
+      "label": "Rotation Speed",
+      "min": 1,
+      "max": 20,
+      "step": 1,
+      "default": 10,
+      "unit": "deg"
+    },
+    {
+      "type": "range",
+      "id": "large_circle_border_width",
+      "label": "Large Circle Border Width",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "default": 2,
+      "unit": "px"
+    },
+    {
+      "type": "color",
+      "id": "large_circle_border_color",
+      "label": "Large Circle Border Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "large_circle_bg_color",
+      "label": "Large Circle Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "small_circle_border_width",
+      "label": "Small Circle Border Width",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "default": 2,
+      "unit": "px"
+    },
+    {
+      "type": "color",
+      "id": "small_circle_border_color",
+      "label": "Small Circle Border Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "small_circle_bg_color",
+      "label": "Small Circle Background Color",
+      "default": "#ffffff"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "product",
+      "name": "Product/Collection",
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Select Product"
+        },
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Select Collection"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Circle Product Display",
+      "blocks": []
+    }
+  ]
+}
+{% endschema %}
