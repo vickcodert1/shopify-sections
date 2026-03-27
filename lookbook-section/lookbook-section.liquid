@@ -1,1 +1,602 @@
+{% comment %} Images: responsive image widths {% endcomment %}
+{%- assign widths = '180, 360, 540, 720, 900, 1080, 1296, 1512, 1728, 1950, 2100, 2260, 2450, 2700, 3000, 3350, 3750, 4100' -%}
 
+{%- comment -%} Text: custom font_picker values {%- endcomment -%}
+{%- capture font_settings_list -%}
+{{ section.settings.main_font | font_face: font_display: 'swap' }}~
+{{ section.settings.main_font | font_modify: 'weight', 'bolder' | font_face: font_display: 'swap' }}~
+{{ section.settings.main_font | font_modify: 'style', 'italic' | font_face: font_display: 'swap' }}~
+{{ section.settings.main_font | font_modify: 'style', 'italic' | font_modify: 'weight', 'bolder' | font_face: font_display: 'swap' }}~
+{{ section.settings.heading_font | font_face: font_display: 'swap' }}~
+{{ section.settings.heading_font | font_modify: 'weight', 'bolder' | font_face: font_display: 'swap' }}~
+{{ section.settings.heading_font | font_modify: 'style', 'italic' | font_face: font_display: 'swap' }}~
+{{ section.settings.heading_font | font_modify: 'style', 'italic' | font_modify: 'weight', 'bolder' | font_face: font_display: 'swap' }}
+{%- endcapture -%}
+{%- assign font_array = font_settings_list | split: '~' -%}
+
+{%- capture minify -%}
+{%- comment -%} CSS {%- endcomment -%}
+<style>
+.wbs-pck__image img {
+width: -webkit-fill-available;
+}
+@media screen and (max-width: 768px){
+ .wbs-pck__image img {
+    display: block !important;
+    height: 45vh !important;
+}
+
+ .wbs-pck__product-pin--active .wbs-pck__product-info-tab {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(-47%) scale(0.6) !important;
+    pointer-events: all;
+}
+
+  .wbs-pck__product-info-tab--left {
+        left: 0px !important;
+    }
+
+  .wbs-pck__product-info-tab--right {
+        right: 0px !important;
+    }
+}
+  
+{%- if section.settings.override_theme_font != blank -%}
+  {%- for font in font_array -%}
+    {%- unless font contains 'error' -%}{{ font }}{%- endunless -%}
+  {%- endfor -%}
+  #WP--{{ section.id }} {
+    --main-font: {{ section.settings.main_font.family }}, {{ section.settings.main_font.fallback_families }};
+    --main-font-weight: {{ section.settings.main_font.weight }};
+    --main-font-style: {{ section.settings.main_font.style }};
+    --heading-font: {{ section.settings.heading_font.family }}, {{ section.settings.heading_font.fallback_families }};
+    --heading-font-weight: {{ section.settings.heading_font.weight }};
+    --heading-font-style: {{ section.settings.heading_font.style }};
+  }
+{%- endif -%}
+
+/*** Width ***/
+
+#shopify-section-{{ section.id }}.WP__widths {
+  {%- if section.settings.section_width == 'half' -%}
+    width: 50%;
+  {%- else -%}
+    width: 100%
+  {%- endif -%}
+}
+
+#WP--{{ section.id }} {
+  --pin-size: 18px;
+  margin-bottom: {{ section.settings.outer_margin }}px;
+  margin-top: {{ section.settings.outer_margin }}px;
+}
+
+
+#WP--{{ section.id }} a {
+  text-decoration: none;
+}
+
+#WP--{{ section.id }}.wbs-pck__width--half {
+  font-size: 16px;
+}
+
+#WP--{{ section.id }}.wbs-pck__width--full {
+  font-size: 18px;
+}
+
+#WP--{{ section.id }} .wbs-pck__image img {
+  display: block;
+  height: auto;
+}
+
+/* Product pins */
+
+#WP--{{ section.id }} .wbs-pck__product-pin {
+  position: absolute;
+  width: var(--pin-size);
+  height: var(--pin-size);
+  top: 50%;
+  left: 50%;
+  border-radius: 50%;
+  cursor: pointer;
+  display: block;
+  transition: transform 0.5s cubic-bezier(0.15,0.99,0.18,0.99);
+  box-shadow: 2px 2px 15px {{ section.settings.pin_highlight_color | color_darken: 100 }};
+  background: {{ section.settings.pin_highlight_color }};
+}
+
+#WP--{{ section.id }} .wbs-pck__product-pin::after {
+  position: absolute;
+  top: -55%;
+  left: -55%;
+  width: 211%;
+  height: 211%;
+  content: "";
+  border: thin solid {{ section.settings.pin_highlight_color | color_modify: 'alpha', 0.5 }};
+  border-radius: 50%;
+  transform-origin: 50% 50%;
+  transition: background .5s linear,transform .5s cubic-bezier(.15,.99,.18,.99),border-color .2s linear;
+}
+
+#WP--{{ section.id }} .wbs-pck__product-pin.wbs-pck__product-pin--active::after {
+  background: {{ section.settings.pin_highlight_color | color_modify: 'alpha', 0.35 }};
+  border-color: transparent;
+}
+
+#WP--{{ section.id }} .wbs-pck__product-pin:hover:after {
+  border-color: hsla(0,0%,97.6%,0);
+  background: {{ section.settings.pin_highlight_color | color_modify: 'alpha', 0.35 }};
+}
+
+#WP--{{ section.id }} .wbs-pck__product-info-tab {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%) scale(0.8);
+  transition: all 0.3s ease;
+  opacity: 0;
+  visibility: hidden;
+  width: max-content;
+  max-width: 15em;
+  padding: 0.4em 0.8em;
+  box-shadow: rgb(0 0 0 / 25%) 0px 14px 28px, rgb(0 0 0 / 22%) 0px 10px 10px;
+  background: {{ section.settings.text_background_color }};
+}
+
+#WP--{{ section.id }} .wbs-pck__product-pin--active .wbs-pck__product-info-tab {
+  visibility: visible;
+  opacity: 1;
+  transform: translateY(-50%) scale(1);
+  pointer-events: all;
+}
+
+
+
+#WP--{{ section.id }} .wbs-pck__product-info-tab a,
+#WP--{{ section.id }} .wbs-pck__product-info-tab p {
+  margin-bottom: 0;
+  color: {{ section.settings.text_color }};
+}
+
+#WP--{{ section.id }} .wbs-pck__product-info-tab--left {
+  left: 35px;
+}
+
+#WP--{{ section.id }} .wbs-pck__product-info-tab--right {
+  right: 35px;
+}
+
+#WP--{{ section.id }} .wbs-pck__title {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0;
+  font-size: calc({{ section.settings.text_size | times: 0.01 }} * 1em);
+  {%- if section.settings.override_theme_font != blank -%}
+  font-family: var(--heading-font);
+  font-weight: var(--heading-font-weight);
+  font-style: var(--heading-font-style);
+  {%- endif -%}
+}
+
+#WP--{{ section.id }} .wbs-pck__arrow {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 1, 1);
+}
+
+#WP--{{ section.id }} .wbs-pck__product-info-tab:hover .wbs-pck__arrow {
+  transform: translateX(3px);
+}
+
+#WP--{{ section.id }} .wbs-pck__description {
+  margin: 3px 0 0;
+  font-size: calc({{ section.settings.text_size | times: 0.01 }} * 0.8em);
+  {%- if section.settings.override_theme_font != blank -%}
+  font-family: var(--main-font);
+  font-weight: var(--main-font-weight);
+  font-style: var(--main-font-style);
+  {%- endif -%}
+}
+
+#WP--{{ section.id }} .wbs-pck__title span:first-of-type {
+  margin-right: 10px;
+}
+
+#WP--{{ section.id }} .wbs-pck__dot-area {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 30px;
+  bottom: 30px;
+}
+
+.wbs-pck__sizer{
+  position: relative;
+}
+
+#WP--{{ section.id }} .wbs-pck__placeholder {
+  background-color: {{ section.settings.text_background_color | color_darken: 10 }};
+  fill: {{ section.settings.text_background_color | color_lighten: 10 }};
+}
+
+{%- if section.settings.custom_css != blank -%}
+  {%- assign custom_section_declarations = section.settings.custom_css | split: '}' -%}
+  {%- for declaration in custom_section_declarations -%}
+    {%- if declaration contains '{' -%}
+      #WP--{{ section.id }} {{ declaration }} }
+    {%- endif -%}
+  {%- endfor -%}
+{%- endif -%}
+
+/* Landscape phone to portrait tablet */
+@media (max-width: 767px) {
+  #WP--{{ section.id }}.wbs-pck__width--half,
+  #WP--{{ section.id }}.wbs-pck__width--full {
+    font-size: 14px;
+  }
+
+  #WP--{{ section.id }} .wbs-pck__product-info-tab {
+    max-width: 45vw;
+  }
+
+  #WP--{{ section.id }} .wbs-pck__product-info-tab--left {
+    left: 20px;
+  }
+
+  #WP--{{ section.id }} .wbs-pck__product-info-tab--right {
+    right: 20px;
+  }
+}
+
+/* Landscape phones and down */
+@media (max-width: 480px) {
+  #WP--{{ section.id }} {
+    margin-top: {{ section.settings.outer_margin | divided_by: 2 }}px;
+    margin-bottom: {{ section.settings.outer_margin | divided_by: 2 }}px;
+  }
+
+  {%- if section.settings.mobile_custom_css != blank -%}
+    {%- assign mobile_custom_declarations = section.settings.mobile_custom_css | split: '}' -%}
+    {%- for declaration in mobile_custom_declarations -%}
+      {%- if declaration contains '{' -%}
+        #WP--{{ section.id }} {{ declaration }} }
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
+}
+</style>
+
+{%- comment -%} HTML {%- endcomment -%}
+<section id="WP--{{ section.id }}" class="WP--{{ section.id }} wbs-pck__shop-the-collection wbs-pck__section wbs-pck__width--{{ section.settings.section_width }}">
+  <div class="wbs-pck__sizer">
+    <div class="wbs-pck__image">
+        {%- if section.settings.image != blank -%}
+          {%- capture sizes -%}
+            {%- if section.settings.section_width == 'full' -%}
+              100vw
+            {%- else -%}
+              50vw
+            {%- endif -%}
+          {%- endcapture -%}
+          {{ section.settings.image | image_url: width: 5000 | image_tag:  widths: widths, sizes: sizes }}
+        {%- else -%}
+          {{ 'collection-1' | placeholder_svg_tag: 'wbs-pck__placeholder' }}
+        {%- endif -%}
+        <div class="wbs-pck__dot-area">
+          {%- for block in section.blocks -%}
+            {%- capture product_tab_location -%}
+              wbs-pck__product-info-tab--{%- if block.settings.horizontal > 50 -%}right{%- else -%}left{%- endif -%}
+            {%- endcapture -%}
+            <div id="wbs-pck__product-pin-id-{{ block.id }}"
+                  class="wbs-pck__product-pin {% if forloop.first %}wbs-pck__product-pin--active{% endif %}"
+                  data-wbs-pck-product-pin="{{ block.settings.product }}"
+                  style="top:{{ block.settings.vertical }}% !important; left:{{ block.settings.horizontal }}%; display: flex; justify-content: center; align-items: center;"
+                  {{ block.shopify_attributes }}
+                  >
+              {% if section.settings.show_toggle_element %}
+              <svg role="presentation" focusable="false" stroke-width="2" width="8" height="8" class="icon icon-plus" viewBox="0 0 12 12" style="color: {{ section.settings.Icon-color }};">
+        <path d="M6 0V12" fill="none" stroke="currentColor"></path>
+        <path d="M0 6L12 6" fill="none" stroke="currentColor"></path>
+      </svg>
+                {% endif %}
+              <div class="wbs-pck__product-info-tab {{ product_tab_location }} {% if forloop.first %}
+                    wbs-pck__product-info--active{% endif %}"
+                    data-wbs-pck-product-info="{{ block.settings.product }}"
+                    >
+                <a href="{{ block.settings.product.url }}">
+                  <p class="wbs-pck__title">
+                    <span class="wbs-pck__heading">{{ block.settings.product.title | default: 'Product title' }}</span>
+                    <span class="wbs-pck__arrow">&rarr;</span>
+                  </p>
+                  {%- if block.settings.description != blank -%}
+                    <div class="wbs-pck__description">{{ block.settings.description }}</div>
+                  {%- endif -%}
+                </a>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+    </div>
+  </div>
+</section>
+{%- endcapture -%}
+{{ minify | strip_newlines }}
+
+{% schema %}
+{
+  "name": "Lookbook section",
+  "class": "WP__shop-the-collection WP__widths",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "header",
+      "content": "Text appearance"
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "label": "Text size",
+      "min": 80,
+      "max": 120,
+      "step": 5,
+      "default": 100,
+      "unit": "%"
+    },
+    {
+      "type": "header",
+      "content": "Design"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_toggle_element",
+      "label": "Icon Show/Hide"
+    },
+     {
+      "type": "color",
+      "id": "Icon-color",
+      "label": "Icon color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "pin_highlight_color",
+      "label": "Pin highlight",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#102225"
+    },
+    {
+      "type": "color",
+      "id": "text_background_color",
+      "label": "Text background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Size",
+      "default": "full",
+      "info": "Allows two sections to sit side-by-side.",
+      "options": [
+        {
+          "value": "full",
+          "label": "Full"
+        },
+        {
+          "value": "half",
+          "label": "Half"
+        }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "inner_padding",
+      "label": "Inner padding",
+      "info": "Only applies to top and bottom.",
+      "min": 10,
+      "max": 100,
+      "default": 40,
+      "step": 5,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "outer_margin",
+      "label": "Outer margin",
+      "info": "Only applies to top and bottom.",
+      "min": 0,
+      "max": 100,
+      "default": 0,
+      "step": 5,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Advanced"
+    },
+    {
+      "type": "liquid",
+      "id": "custom_css",
+      "label": "CSS"
+    },
+    {
+      "type": "liquid",
+      "id": "mobile_custom_css",
+      "label": "Mobile CSS",
+      "info": "Applied on screens less than 480px."
+    },
+    {
+      "type": "checkbox",
+      "id": "override_theme_font",
+      "label": "Override default theme font",
+      "default": true
+    },
+    {
+      "type": "font_picker",
+      "id": "heading_font",
+      "label": "Product title",
+      "default": "serif"
+    },
+    {
+      "type": "font_picker",
+      "id": "main_font",
+      "label": "Description",
+      "default": "sans-serif"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "product",
+      "name": "Product",
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product"
+        },
+        {
+          "type": "text",
+          "id": "description",
+          "label": "Description"
+        },
+        {
+          "type": "range",
+          "id": "horizontal",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "Horizontal position",
+          "default": 50
+        },
+        {
+          "type": "range",
+          "id": "vertical",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "Vertical position",
+          "default": 50
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Lookbook section",
+      "settings": {
+      },
+      "blocks": [
+        {
+          "type": "product",
+          "settings": {
+            "horizontal": 22,
+            "vertical": 39
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
+
+<script type="application/json" data-wbs-pck="{{ section.id }}">
+  {
+    "id": {{ section.id | json }},
+    "section_width": {{ section.settings.section_width | json }}
+  }
+</script>
+{%- comment -%} JavaScript {%- endcomment -%}
+<script
+  data-wbs-pck-js="{{ section.id }}"
+  type="module"
+  defer
+>
+(function(){
+
+  const wbsPack = {
+    settings: {},
+    selectProduct: function(product_handle, product_dots, section){
+
+      const active_product = section.querySelector(`[data-wbs-pck-product-info="${product_handle}"]`);
+      const active_dot = section.querySelector(`[data-wbs-pck-product-pin="${product_handle}"]`);
+      const product_infos = section.querySelectorAll(`[data-wbs-pck-product-info]`)
+
+      // Remove all dot classes and add active selection
+      product_dots.forEach((product_dot) => {
+        product_dot.classList.remove('wbs-pck__product-pin--active');
+      })
+      active_dot.classList.add('wbs-pck__product-pin--active');
+
+      // Remove previous active product class and add active selection
+      product_infos.forEach((product_info) => {
+        product_info.classList.remove('wbs-pck__product-info--active');
+      })
+      active_product.classList.add('wbs-pck__product-info--active');
+
+    },
+    load: function(section){
+
+      // Grab all the product dots
+      const product_dots = section.querySelectorAll('[data-wbs-pck-product-pin]');
+      // Setup Dot Event Listener
+      product_dots.forEach((product_dot) => {
+        product_dot.addEventListener('click', (e) => {
+          const product_handle = e.target.dataset.wbsPckProductPin;
+          this.selectProduct(product_handle, product_dots, section);
+        });
+      });
+
+      // Add extra class for width setting
+      const widthSection = section.closest('.WP__widths');
+      if (typeof widthSection !== 'undefined' && widthSection !== null) {
+        section.closest('.WP__widths').classList.add(`WP__width--${this.settings.section_width}`);
+      }
+    },
+    unload: function(section){
+      // Grab all the product dots
+      const product_dots = section.querySelectorAll('[data-wbs-pck-product-pin]');
+      // Remove Dot Event Listener
+      product_dots.forEach((product_dot) => {
+        const product_handle = product_dot.dataset.wbsPckProductDot;
+        product_dot.removeEventListener('click', (e) => wbsPack.selectProduct(product_handle, product_dots, section));
+      });
+    }
+  }
+
+  window.addEventListener('shopify:section:unload', function (e) {
+    const settings = document.querySelector(`[data-wbs-pck="${e.detail.sectionId}"]`);
+    const sectionId = e.detail.sectionId;
+    const section = document.querySelector(`#WP--${e.detail.sectionId}`);
+    if (sectionId == wbsPack.settings.id){
+      wbsPack.unload(section);
+    }
+  });
+
+  window.addEventListener('shopify:block:select', function (e) {
+    const section = document.querySelector(`#WP--${e.detail.sectionId}`);
+    const product_dots = section.querySelectorAll('[data-wbs-pck-product-pin]');
+    const product_handle = e.target.dataset.wbsPckProductPin;
+    wbsPack.selectProduct(product_handle, product_dots, section);
+  });
+
+  wbsPack.settings = JSON.parse(document.querySelector('[data-wbs-pck="{{ section.id }}"]').innerHTML);
+  const sectionId = {{ section.id | json }};
+  const section = document.querySelector(`#WP--${sectionId}`);
+
+  if (sectionId == wbsPack.settings.id){
+    wbsPack.load(section);
+  }
+})()
+</script>
