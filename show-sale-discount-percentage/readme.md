@@ -1,8 +1,8 @@
-Step 1:
+## **Step 1**:
 
-Replace the code in _product-card-gallery.liquid
+# Replace the code in _product-card-gallery.liquid
 
-Replace the following code in _product-card-gallery.liquid
+# Replace the following code in _product-card-gallery.liquid
 
 {%- if product.available == false or product.compare_at_price > product.price and product.available -%}
     <div
@@ -20,7 +20,8 @@ Replace the following code in _product-card-gallery.liquid
   {%- endif -%}
 With the following code
 
-Copy Code
+# Copy Code
+
 {%- assign current_variant = product.selected_or_first_available_variant -%}
 {%- assign compare_at_price = product.compare_at_price_max -%}
 {%- assign price = product.price -%}
@@ -50,7 +51,7 @@ Copy Code
     </div>
 {%- endif -%}
 
-Step 3:
+## ** Step 3 **:
 
 Add block in Product Page Template
 
