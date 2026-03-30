@@ -46,3 +46,10 @@ Copy Code
       {%- endif -%}
     </div>
 {%- endif -%}
+
+Step 3: Add block in Product Page Template
+Goto Customize theme >> Product Page Template and Add New Block as per the screenshot below:
+
+[!(https://websensepro.com/wp-content/uploads/2025/05/price-code-block.png)]
+
+[![Show Sale Discount Percentage in Shopify](https://i.ytimg.com/vi/ynLP7Wqx-Vc/maxresdefault.jpg)](https://youtu.be/ynLP7Wqx-Vc?list=PLvT_6E7D1NZIlHa09cgswsjD9QunUpHKy)
